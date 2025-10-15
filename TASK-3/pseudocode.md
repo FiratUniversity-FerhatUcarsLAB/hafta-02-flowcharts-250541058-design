@@ -59,7 +59,15 @@ Fonksiyon RandevuOlustur():
         Yaz("Bu saat doktor mesai saatleri dışında. Farklı saat seçin.")
         Return
 
-    RandevuListesi.Ekle({TC, DoktorID, Saat})
+    RandevuTuru = Input("Randevu türünü seçin: 1) Muayene 2) Tahlil Analizi 3) Röntgen Analizi")
+    
+    Eğer RandevuTuru = "Tahlil Analizi" ise
+        TahlilSonucu = Input("Tahlil sonucunu girin: ")
+    
+    Eğer RandevuTuru = "Röntgen Analizi" ise
+        RontgenSonucu = Input("Röntgen sonucunu girin: ")
+
+    RandevuListesi.Ekle({TC, DoktorID, Saat, RandevuTuru})
     Yaz("Randevu oluşturuldu.")
 
 // Doktor çıkış saatini hesaplama fonksiyonu
@@ -89,3 +97,4 @@ While True:
         Break
 
 Bitir
+
