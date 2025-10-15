@@ -1,76 +1,74 @@
-digraph ATM_System {
-    rankdir=TB;
-    node [shape=rectangle, style=rounded, fontname="Arial"];
+digraph ATM {
+  rankdir=TB;
+  splines=true;
+  node [fontname="Helvetica", fontsize=10];
 
-    Start [label="Başla", shape=oval, style=filled, fillcolor=lightblue];
-    InsertCard [label="Kart takıldı mı?"];
-    ReadCard [label="Kart okunuyor"];
-    CardBlocked [label="Kart blokeli mi?", shape=diamond];
-    EnterPIN [label="PIN gir", shape=parallelogram];
-    VerifyPIN [label="PIN doğru mu?", shape=diamond];
-    BlockCard [label="Kart bloke edildi", style=filled, fillcolor=lightcoral];
-    SelectAccount [label="Hesap seçimi"];
-    Menu [label="İşlem menüsü:\n1-Bakiye\n2-Çekme\n3-Yatırma\n4-Havale\n5-PIN Değiştir\n6-Çıkış"];
-    
-    // İşlemler
-    Balance [label="Bakiye görüntüle"];
-    Withdraw [label="Para çekme"];
-    Deposit [label="Para yatırma"];
-    Transfer [label="Havale / EFT"];
-    ChangePIN [label="PIN değiştir"];
-    Exit [label="Kartı iade et", shape=oval, style=filled, fillcolor=lightgrey];
+  // Node shape definitions
+  Start [label="Başla", shape=oval];
+  PromptPIN [label="PIN Gir", shape=box];
+  CheckPIN [label="PIN Doğru?", shape=diamond];
+  IncrementPIN [label="pinAttempts++", shape=box];
+  ShowRemaining [label="Kalan deneme göster", shape=box];
+  BlockCard [label="Kart bloke\n(4 yanlış)", shape=box, style=filled, fillcolor="#ffcccc"];
+  AuthSuccess [label="Doğrulandı", shape=oval];
 
-    // Para çekme detayları
-    WithdrawAmount [label="Tutar gir", shape=parallelogram];
-    CheckBalance [label="Yetersiz bakiye?", shape=diamond];
-    CheckLimit [label="Limit aşıldı mı?", shape=diamond];
-    DispenseCash [label="Parayı ver"];
-    PrintReceipt [label="Fiş yazdır"];
-    
-    // Bağlantılar
-    Start -> InsertCard;
-    InsertCard -> ReadCard [label="Evet"];
-    InsertCard -> Start [label="Hayır"];
+  ShowMenu [label="Menü göster\n(1:Bakiye, 2:Çek, 3:Çıkış)", shape=box];
+  Choice [label="Seçim?", shape=diamond];
 
-    ReadCard -> CardBlocked;
-    CardBlocked -> Exit [label="Evet"];
-    CardBlocked -> EnterPIN [label="Hayır"];
+  ShowBalance [label="Bakiye göster", shape=box];
+  PromptAmount [label="Çekilecek tutarı gir", shape=box];
+  CheckDailyCount [label="Günlük işlem kaldı mı?\n(dailyWithdrawCount < 9)", shape=diamond];
+  CheckRange [label="Tutar 90-9000 arasında mı?", shape=diamond];
+  CheckBalance [label="Bakiye yeterli mi?", shape=diamond];
+  WithdrawSuccess [label="Para çekildi\n(bakiye -= amount,\ndailyWithdrawCount++)", shape=box, style=filled, fillcolor="#ccffcc"];
+  WithdrawFail [label="İşlem reddedildi\n(hata mesajı göster)", shape=box, style=filled, fillcolor="#ffe6cc"];
 
-    EnterPIN -> VerifyPIN;
-    VerifyPIN -> SelectAccount [label="Doğru"];
-    VerifyPIN -> BlockCard [label="Yanlış (3. kez)"];
-    VerifyPIN -> EnterPIN [label="Yanlış (tekrar)"];
-    BlockCard -> Exit;
+  Exit [label="Çıkış\n(Program sonlanır)", shape=oval];
 
-    SelectAccount -> Menu;
+  // Authentication loop edges
+  Start -> PromptPIN;
+  PromptPIN -> CheckPIN;
+  CheckPIN -> AuthSuccess [label="evet"];
+  CheckPIN -> IncrementPIN [label="hayır"];
+  IncrementPIN -> ShowRemaining;
+  ShowRemaining -> CheckPIN [label="pinAttempts < 4"];
+  IncrementPIN -> BlockCard [label="pinAttempts == 4"];
+  BlockCard -> Exit;
 
-    Menu -> Balance [label="1"];
-    Menu -> Withdraw [label="2"];
-    Menu -> Deposit [label="3"];
-    Menu -> Transfer [label="4"];
-    Menu -> ChangePIN [label="5"];
-    Menu -> Exit [label="6"];
+  // After auth
+  AuthSuccess -> ShowMenu;
 
-    // Balance işlemi
-    Balance -> PrintReceipt -> Menu;
+  // Menu choices
+  ShowMenu -> Choice;
+  Choice -> ShowBalance [label="1"];
+  Choice -> PromptAmount [label="2"];
+  Choice -> Exit [label="3"];
+  Choice -> ShowMenu [label="başka / geçersiz", tooltip="Geçersiz seçim -> menüye dön"];
 
-    // Withdraw işlemi (detaylı)
-    Withdraw -> WithdrawAmount -> CheckBalance;
-    CheckBalance -> Menu [label="Evet"];
-    CheckBalance -> CheckLimit [label="Hayır"];
-    CheckLimit -> Menu [label="Evet"];
-    CheckLimit -> DispenseCash [label="Hayır"];
-    DispenseCash -> PrintReceipt -> Menu;
+  // Show balance flow
+  ShowBalance -> ShowMenu;
 
-    // Deposit işlemi
-    Deposit -> PrintReceipt -> Menu;
+  // Withdraw flow checks
+  PromptAmount -> CheckDailyCount;
+  CheckDailyCount -> WithdrawFail [label="hayır", tooltip="Günlük hak doldu"];
+  CheckDailyCount -> CheckRange [label="evet"];
+  CheckRange -> WithdrawFail [label="hayır", tooltip="Tutar 90-9000 aralığında değil"];
+  CheckRange -> CheckBalance [label="evet"];
+  CheckBalance -> WithdrawFail [label="hayır", tooltip="Bakiye yetersiz"];
+  CheckBalance -> WithdrawSuccess [label="evet"];
+  WithdrawSuccess -> ShowMenu;
+  WithdrawFail -> ShowMenu;
 
-    // Transfer işlemi
-    Transfer -> PrintReceipt -> Menu;
+  // Styling for important nodes
+  node [shape=box];
+  { rank = same; CheckDailyCount; CheckRange; CheckBalance; }
 
-    // PIN değişikliği
-    ChangePIN -> PrintReceipt -> Menu;
+  // Notes (invisible node) for constants
+  Consts [label="Sabitler:\nMAX_DAILY_WITHDRAWS=9\nMIN_PER_WITHDRAW=90\nMAX_PER_WITHDRAW=9000\nINITIAL_BALANCE=30000\nMAX_PIN_ATTEMPTS=4", shape=note];
+  Start -> Consts [style=dotted, arrowhead=none];
 
-    // Çıkış
-    Exit -> Start [label="Yeni müşteri"];
+  // Prevent overlapping labels too much
+  edge [fontsize=9];
+}
+
 }
