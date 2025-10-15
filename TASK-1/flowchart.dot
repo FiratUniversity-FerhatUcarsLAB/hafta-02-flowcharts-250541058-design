@@ -1,0 +1,76 @@
+digraph ATM_System {
+    rankdir=TB;
+    node [shape=rectangle, style=rounded, fontname="Arial"];
+
+    Start [label="Başla", shape=oval, style=filled, fillcolor=lightblue];
+    InsertCard [label="Kart takıldı mı?"];
+    ReadCard [label="Kart okunuyor"];
+    CardBlocked [label="Kart blokeli mi?", shape=diamond];
+    EnterPIN [label="PIN gir", shape=parallelogram];
+    VerifyPIN [label="PIN doğru mu?", shape=diamond];
+    BlockCard [label="Kart bloke edildi", style=filled, fillcolor=lightcoral];
+    SelectAccount [label="Hesap seçimi"];
+    Menu [label="İşlem menüsü:\n1-Bakiye\n2-Çekme\n3-Yatırma\n4-Havale\n5-PIN Değiştir\n6-Çıkış"];
+    
+    // İşlemler
+    Balance [label="Bakiye görüntüle"];
+    Withdraw [label="Para çekme"];
+    Deposit [label="Para yatırma"];
+    Transfer [label="Havale / EFT"];
+    ChangePIN [label="PIN değiştir"];
+    Exit [label="Kartı iade et", shape=oval, style=filled, fillcolor=lightgrey];
+
+    // Para çekme detayları
+    WithdrawAmount [label="Tutar gir", shape=parallelogram];
+    CheckBalance [label="Yetersiz bakiye?", shape=diamond];
+    CheckLimit [label="Limit aşıldı mı?", shape=diamond];
+    DispenseCash [label="Parayı ver"];
+    PrintReceipt [label="Fiş yazdır"];
+    
+    // Bağlantılar
+    Start -> InsertCard;
+    InsertCard -> ReadCard [label="Evet"];
+    InsertCard -> Start [label="Hayır"];
+
+    ReadCard -> CardBlocked;
+    CardBlocked -> Exit [label="Evet"];
+    CardBlocked -> EnterPIN [label="Hayır"];
+
+    EnterPIN -> VerifyPIN;
+    VerifyPIN -> SelectAccount [label="Doğru"];
+    VerifyPIN -> BlockCard [label="Yanlış (3. kez)"];
+    VerifyPIN -> EnterPIN [label="Yanlış (tekrar)"];
+    BlockCard -> Exit;
+
+    SelectAccount -> Menu;
+
+    Menu -> Balance [label="1"];
+    Menu -> Withdraw [label="2"];
+    Menu -> Deposit [label="3"];
+    Menu -> Transfer [label="4"];
+    Menu -> ChangePIN [label="5"];
+    Menu -> Exit [label="6"];
+
+    // Balance işlemi
+    Balance -> PrintReceipt -> Menu;
+
+    // Withdraw işlemi (detaylı)
+    Withdraw -> WithdrawAmount -> CheckBalance;
+    CheckBalance -> Menu [label="Evet"];
+    CheckBalance -> CheckLimit [label="Hayır"];
+    CheckLimit -> Menu [label="Evet"];
+    CheckLimit -> DispenseCash [label="Hayır"];
+    DispenseCash -> PrintReceipt -> Menu;
+
+    // Deposit işlemi
+    Deposit -> PrintReceipt -> Menu;
+
+    // Transfer işlemi
+    Transfer -> PrintReceipt -> Menu;
+
+    // PIN değişikliği
+    ChangePIN -> PrintReceipt -> Menu;
+
+    // Çıkış
+    Exit -> Start [label="Yeni müşteri"];
+}
