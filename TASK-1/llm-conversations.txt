@@ -1,2 +1,3 @@
-senden atm-sistemi konusunda iyi yapılmış bir pseudocode istiyorum bu sistemi günlük hayattan esinlenerek yapar mısın
-şimdi bebeğim senden bu pseudocode un dot kodunu istiyorum yaapr mısın
+ben bir atm sistemi kurmak istiyorum. bu atm de mevcut hesap bakiyem 30.000 TÜRK lirası. günlük para çekme hakkım 9 ve hak başına çekebileceğim en yüksek bakiye 9000 tl, en düşük mikatrda 90tl. kart şifremi 3 kere yanlış girersem 4.denemem de yanlış olursa kart bloke oluyor. bana bu sistemin pseudocode nu yazar mısın cınım
+
+şimdi bana bunun dot kodunu yazar mısın bebeğim
