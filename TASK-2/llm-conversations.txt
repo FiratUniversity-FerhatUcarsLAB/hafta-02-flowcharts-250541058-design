@@ -1,0 +1,7 @@
+online bir alışveriş sistemi kuracağım. bu sistemde kullanıcının sipariş verebilmesi için kullanıcı girşi yapması gerekiyor. kurduuğum alışveriş
+sitesi makyaj malzemelerinin ve cilt bakım ürünlerinin satışını yapıyor. bir üründen en fazla 9 tane alınabilir. sepetin toplam fiyatı 900 tl nin
+üzerinde olduğunda kargo ücreti olmuyor ama 900 tl nin altında olan alışverişlerde kargo ücreti 99 tl olsun. bir ürünün stok sayısı 19. ürün
+sayısı 3 olduğunda "ürün tükenmektedir" uyarısı versin. stoku tükenen ürünler sayfanın en altında gözüksün. bana bu sistemin pseudocode nu yazar mısın
+
+
+şimdi senden bu pseudocode un dot kodunu da isiyorum
