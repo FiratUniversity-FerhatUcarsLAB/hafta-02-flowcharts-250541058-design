@@ -1,0 +1,61 @@
+digraph OnlineShop {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Start / Show Home Page", shape=oval];
+    Action [label="Get User Action"];
+    Register [label="Register User"];
+    Login [label="Login User"];
+    Browse [label="Browse Products"];
+    View [label="View Product"];
+    AddToCart [label="Add Product to Cart"];
+    Checkout [label="Checkout"];
+    Logout [label="Logout"];
+    End [label="End", shape=oval];
+
+    StockCheckLow [label="Stock <= 3? Show 'Ürün Tükenmektedir'", shape=diamond];
+    StockCheckZero [label="Stock == 0? Show 'Out of Stock'", shape=diamond];
+    MaxQtyCheck [label="Qty <= 9?", shape=diamond];
+    PaymentCheck [label="Payment Successful?", shape=diamond];
+    ShippingCostCheck [label="Total >= 900 TL?", shape=diamond];
+
+    ReduceStock [label="Reduce Product Stock"];
+    ClearCart [label="Clear Cart"];
+    SendEmail [label="Send Confirmation Email"];
+    ShowMessage [label="Show Message"];
+
+    // Flow
+    Start -> Action;
+    Action -> Register [label="register"];
+    Action -> Login [label="login"];
+    Action -> Browse [label="browse"];
+    Action -> View [label="view"];
+    Action -> AddToCart [label="add_to_cart"];
+    Action -> Checkout [label="checkout"];
+    Action -> Logout [label="logout"];
+    Action -> End [label="exit"];
+
+    Register -> Action;
+    Login -> Action;
+
+    Browse -> StockCheckLow;
+    StockCheckLow -> Browse [label="No"];
+    StockCheckLow -> Browse [label="Yes: Show warning"];
+    Browse -> Action;
+
+    AddToCart -> MaxQtyCheck;
+    MaxQtyCheck -> ShowMessage [label="No: Error"];
+    MaxQtyCheck -> StockCheckZero [label="Yes"];
+    StockCheckZero -> ShowMessage [label="Yes: Out of Stock"];
+    StockCheckZero -> ShowMessage [label="No: Add to cart"];
+
+    ShowMessage -> Action;
+
+    Checkout -> ShippingCostCheck;
+    ShippingCostCheck -> Checkout [label="Total < 900 TL: Add 99 TL"];
+    ShippingCostCheck -> Checkout [label="Total >= 900 TL: Free Shipping"];
+    Checkout -> PaymentCheck;
+    PaymentCheck -> ReduceStock [label="Yes"];
+    PaymentCheck -> ShowMessage [label="No: Payment Failed"];
+    ReduceStock -> ClearCart -> SendEmail -> ShowMessage -> Action;
+}
