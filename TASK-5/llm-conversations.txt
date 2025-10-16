@@ -1,0 +1,6 @@
+bu güvenlik sistemi bir spor merkezinde geeçelri olsun. binaya giriş yaaprken kimlik doğrulama sistemi bulunsun. parmak izi ya da kimlik
+kartının çipini göstererek giriş yapılabilsin. çıkışlarda aynı şekilde yapılabilsin. parmak izleri taklit edilemez bunnu için güvenlik önlemi al.
+pseudocode nu yazar mısın
+
+
+şimdi dot kodu
