@@ -1,0 +1,2 @@
+ders kayıt sistemi oluştur. bu sistemden bir öğrenci en fazla 8 farklı ders alabilir. derslerin toplam saati 30 u geçmemeli. yani 8 farklı ders alınma
+ve 30 saati geçmeme koşulu var. ders saatlerinin çakışmaması gerekiyor. bunun bana pseudocode nu oluşturur musun
