@@ -1,0 +1,96 @@
+digraph HastaneSistemi {
+    rankdir=TB;
+    node [shape=rectangle, style=rounded, fontname="Arial"];
+
+    // Başlangıç ve bitiş
+    Start [label="Başla", shape=oval, style=filled, fillcolor=lightgreen];
+    End [label="Bitir", shape=oval, style=filled, fillcolor=lightcoral];
+
+    // Ana menü
+    Menu [label="1: Doktor Kaydı\n2: Hasta Kaydı\n3: Randevu Oluştur\n4: Çıkış", shape=parallelogram, fillcolor=lightyellow, style=filled];
+    
+    // Doktor kaydı
+    DoktorKaydi [label="Doktor bilgilerini al:\nAd, ID, mesai, mola, limit", shape=rectangle];
+    DoktorEkle [label="Doktor kaydı oluşturuldu", shape=rectangle];
+    
+    // Hasta kaydı
+    HastaKaydi [label="Hasta TC al", shape=parallelogram];
+    MuayeneKontrol [label="Hasta daha önce muayene oldu mu?", shape=diamond];
+    YeniHastaBilgi [label="Ad, Soyad, Doğum Tarihi, Telefon al", shape=rectangle];
+    HastaEkle [label="Hasta kaydı oluştur", shape=rectangle];
+    EskiHasta [label="Hasta zaten kayıtlı", shape=rectangle];
+    
+    // Randevu oluşturma
+    RandevuTC [label="Randevu alacak hastanın TC'sini al", shape=parallelogram];
+    HastaVarMi [label="Hasta sistemde kayıtlı mı?", shape=diamond];
+    HastaKaydiCagir [label="Hasta kaydı oluştur", shape=rectangle];
+    DoktorSec [label="Doktor ID seç", shape=parallelogram];
+    LimitKontrol [label="Doktorun 30 hasta limiti doldu mu?", shape=diamond];
+    SaatGir [label="Randevu saati gir (HH:MM)", shape=parallelogram];
+    MolaKontrol [label="Saat 13:00-14:00 arasında mı?", shape=diamond];
+    MesaiKontrol [label="Saat 09:00-17:00 arasında mı?", shape=diamond];
+    RandevuTuru [label="Randevu Türü Seç:\n1) Muayene\n2) Tahlil Analizi\n3) Röntgen Analizi", shape=parallelogram];
+    
+    // Analiz durumları
+    TahlilGir [label="Tahlil sonucu gir", shape=rectangle];
+    RontgenGir [label="Röntgen sonucu gir", shape=rectangle];
+    RandevuEkle [label="Randevu oluşturuldu", shape=rectangle];
+
+    // Doktor çıkış hesaplama
+    CikisHesap [label="Doktorun günlük hasta sayısını hesapla", shape=rectangle];
+    ErkenMi [label="Doktor 30 hastayı muayene etti mi?", shape=diamond];
+    ErkenCikis [label="Doktor 17:00'dan önce çıkabilir", shape=rectangle];
+    NormalCikis [label="Doktor 17:00'ye kadar çalışır", shape=rectangle];
+
+    // Akış bağlantıları
+    Start -> Menu;
+
+    // Menü bağlantıları
+    Menu -> DoktorKaydi [label="1"];
+    Menu -> HastaKaydi [label="2"];
+    Menu -> RandevuTC [label="3"];
+    Menu -> End [label="4"];
+
+    // Doktor kaydı akışı
+    DoktorKaydi -> DoktorEkle -> Menu;
+
+    // Hasta kaydı akışı
+    HastaKaydi -> MuayeneKontrol;
+    MuayeneKontrol -> YeniHastaBilgi [label="Hayır"];
+    MuayeneKontrol -> EskiHasta [label="Evet"];
+    YeniHastaBilgi -> HastaEkle -> Menu;
+    EskiHasta -> Menu;
+
+    // Randevu akışı
+    RandevuTC -> HastaVarMi;
+    HastaVarMi -> HastaKaydiCagir [label="Hayır"];
+    HastaVarMi -> DoktorSec [label="Evet"];
+    HastaKaydiCagir -> DoktorSec;
+
+    DoktorSec -> LimitKontrol;
+    LimitKontrol -> Menu [label="Evet"];
+    LimitKontrol -> SaatGir [label="Hayır"];
+
+    SaatGir -> MolaKontrol;
+    MolaKontrol -> SaatGir [label="Evet"];
+    MolaKontrol -> MesaiKontrol [label="Hayır"];
+
+    MesaiKontrol -> SaatGir [label="Hayır"];
+    MesaiKontrol -> RandevuTuru [label="Evet"];
+
+    // Randevu türleri
+    RandevuTuru -> RandevuEkle [label="1) Muayene"];
+    RandevuTuru -> TahlilGir [label="2) Tahlil Analizi"];
+    RandevuTuru -> RontgenGir [label="3) Röntgen Analizi"];
+
+    TahlilGir -> RandevuEkle;
+    RontgenGir -> RandevuEkle;
+    RandevuEkle -> CikisHesap;
+
+    // Çıkış hesaplama
+    CikisHesap -> ErkenMi;
+    ErkenMi -> ErkenCikis [label="Evet"];
+    ErkenMi -> NormalCikis [label="Hayır"];
+    ErkenCikis -> Menu;
+    NormalCikis -> Menu;
+}
