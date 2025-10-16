@@ -1,3 +1,10 @@
 ben bir atm sistemi kurmak istiyorum. bu atm de mevcut hesap bakiyem 30.000 TÜRK lirası. günlük para çekme hakkım 9 ve hak başına çekebileceğim en yüksek bakiye 9000 tl, en düşük mikatrda 90tl. kart şifremi 3 kere yanlış girersem 4.denemem de yanlış olursa kart bloke oluyor. bana bu sistemin pseudocode nu yazar mısın cınım
+Tabii — aşağıda verdiğin kurallara göre temiz, adım adım okunabilir bir pseudocode hazırladım. İstersen bunu doğrudan kod haline de getiririz.
 
-şimdi bana bunun dot kodunu yazar mısın bebeğim
+
+şimdi bana bunun dot kodunu yazar mısın
+İstersen bu diyagramı:
+
+Her kullanıcı için günlük sayaç ve pin bilgilerini gösteren alt-akışlarla genişleteyim,
+
+Veya DOT'i SVG/PNG çıktı ayarlarıyla (etiket boyutu, renkler) daha estetik hâle getireyim.
