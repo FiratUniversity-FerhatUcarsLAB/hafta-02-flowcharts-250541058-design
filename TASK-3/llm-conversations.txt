@@ -1,0 +1,10 @@
+hastane kayıt sistemi oluştur. bu sistemde: hasta kaydı ve doktor kaydı oluştur, randevular alınabilsin bu randevularda şartlar olsun bu şartlar;
+eğer hasta muayeneye geliyorsa kayıt oluşturmak için hastadan tüm kimlik bilgilerini al eğer hasta daha önce muayene olmuşsa bilgileri
+almadan kayıt oluştur. bu kayıtları oluştururken doktorların giriş çıkış mola saatlerinin göz önüne al. ayrıca bir doktor başına günlük 30 hasta
+düşsün. bir doktorun mesai saatleri: 09.00-17.00 arasındadır. doktorun molaya çıkma saati 13.00-14.00 dır. eğer doktor o gün içinde mesaisi
+bitmeden 30 hastayı muayene etmişse saat 17.00 dan önce çıkabilir. ama eğer 30 hasta muayene etmemişse 17.00 dan sonra çıkabilir. bu
+durumları göz önüne alarak nbana pseudocode oluşturur musun
+
+ayrıca bir hasta aynı doktora gün içinde şu durumlarda gözükebilir: 1)muayene, 2)eğer doktor tahlil istediyse tahlil 
+sonuçları analizi ya da doktor röntgen istediyse röntgen sonuçları analiz edilsin. bunu da ekler misin
+şimdş bu pseudocode un dot kodunun istiyorum
