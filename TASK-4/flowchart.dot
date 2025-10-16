@@ -1,0 +1,49 @@
+digraph AddCourseFlow {
+  rankdir=TB;
+  node [fontname="Helvetica, Arial", fontsize=12];
+
+  // Node stilleri
+  start [shape=oval, label="Başla"];
+  end_ok [shape=oval, label="Bitti\n(Ders eklendi)"];
+  end_err [shape=oval, label="Bitti\n(Hata)"];
+
+  // Process ve decision
+  input [shape=rectangle, label="Girdi:\nstudentSchedule, course"];
+  check_exists [shape=diamond, label="Ders zaten kayıtlı mı?"];
+  check_count [shape=diamond, label="Ders sayısı +1 > 8 ?"];
+  check_hours [shape=diamond, label="Toplam saat + course.hours > 30 ?"];
+  check_conflict [shape=diamond, label="Saat çakışması var mı?"];
+
+  add_course [shape=rectangle, label="schedule.courses.append(course)\nMesaj: 'Ders başarıyla eklendi.'"];
+  err_exists [shape=rectangle, label="Hata: 'Ders zaten kayıtlı.'"];
+  err_count [shape=rectangle, label="Hata: 'En fazla 8 farklı ders alabilirsiniz.'"];
+  err_hours [shape=rectangle, label="Hata: 'Toplam ders saati 30'u geçemez.'"];
+  err_conflict [shape=rectangle, label="Hata: 'Ders saatleri mevcut programla çakışıyor.'"];
+
+  // Akış
+  start -> input;
+  input -> check_exists;
+
+  check_exists -> err_exists [label="Evet", color=red];
+  check_exists -> check_count [label="Hayır"];
+
+  check_count -> err_count [label="Evet", color=red];
+  check_count -> check_hours [label="Hayır"];
+
+  check_hours -> err_hours [label="Evet", color=red];
+  check_hours -> check_conflict [label="Hayır"];
+
+  check_conflict -> err_conflict [label="Evet", color=red];
+  check_conflict -> add_course [label="Hayır"];
+
+  // Sonlar
+  err_exists -> end_err;
+  err_count -> end_err;
+  err_hours -> end_err;
+  err_conflict -> end_err;
+
+  add_course -> end_ok;
+
+  // Stil (opsiyonel okunabilirlik)
+  { rank = same; err_exists; err_count; err_hours; err_conflict; }
+}
