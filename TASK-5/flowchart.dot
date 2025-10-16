@@ -1,0 +1,90 @@
+digraph AccessControl {
+  rankdir=TB;
+  fontsize=12;
+  node [fontname="Helvetica, Arial", fontsize=11];
+
+  // Start / End
+  start [shape=oval, label="Başla"];
+  end_ok [shape=oval, label="Erişim Verildi\n(Donanım açıldı)"];
+  end_deny [shape=oval, label="Erişim Reddedildi"];
+  end_guard [shape=oval, label="Güvenlik Onayıyla Geçiş"];
+
+  // Inputs / Devices
+  input [shape=rect, label="Girdi:\ncard_chip_id?, fingerprint_probe?, sensor_data"];
+  device_tamper [shape=diamond, label="Cihaz tamper sensörü tetiklendi mi?"];
+  identify_card [shape=rect, label="Kart ile kullanıcı ara\n(lookup)"];
+  card_known [shape=diamond, label="Kart biliniyor mu?"];
+  fingerprint_present [shape=diamond, label="Parmak izi verisi var mı?"];
+  liveness_check [shape=diamond, label="Liveness / Anti-spoof\n(conf >= threshold?)"];
+  fingerprint_match [shape=diamond, label="Parmak izi eşleşti mi?\n(score >= thresh?)"];
+  card_verify [shape=diamond, label="Kart doğrulandı mı?\n(hash eşleşiyor mu?)"];
+  check_user_allowed [shape=diamond, label="Kullanıcı izinli mi?\n(lock/üyelik durum)"];
+  require_pin [shape=diamond, label="PIN/OTP gerekli mi?"];
+  pin_ok [shape=diamond, label="PIN/OTP doğrulandı mı?"];
+  too_many_failures [shape=diamond, label="Başarısız deneme sayısı > limit?" ];
+  lock_user [shape=rect, label="Kullanıcı geçici kilitlendi\n(lock_until set)"];
+  audit_log [shape=rect, label="Audit: olay kaydı ve imzala"];
+  alert_security [shape=rect, label="Güvenlik ekibini uyar"];
+  guard_override [shape=diamond, label="Gardiyan/Operatör\nüzerinden override istendi mi?"];
+  guard_auth [shape=diamond, label="Guard yetkili mi?"];
+  fallback_deny [shape=rect, label="Reddedildi - Görevliye yönlendir"];
+
+  // Flow
+  start -> input;
+  input -> device_tamper;
+  device_tamper -> alert_security [label="Evet", color=red];
+  alert_security -> audit_log;
+  alert_security -> end_deny;
+  device_tamper -> identify_card [label="Hayır"];
+
+  identify_card -> card_known;
+  card_known -> fingerprint_present [label="Evet"];
+  card_known -> fingerprint_present [label="Hayır"];
+
+  fingerprint_present -> liveness_check [label="Evet"];
+  fingerprint_present -> card_verify [label="Hayır"];
+
+  liveness_check -> audit_log [label="Başarısız", color=red];
+  liveness_check -> fingerprint_match [label="Başarılı"];
+
+  fingerprint_match -> check_user_allowed [label="Eşleşti"];
+  fingerprint_match -> audit_log [label="Eşleşmedi", color=red];
+  fingerprint_match -> too_many_failures [label="Eşleşmedi"];
+
+  card_verify -> check_user_allowed [label="Doğru"];
+  card_verify -> audit_log [label="Kart doğrulama başarısız", color=red];
+  card_verify -> too_many_failures [label="Doğrulama başarısız"];
+
+  check_user_allowed -> require_pin [label="İzinli ve PIN gerekli"];
+  check_user_allowed -> end_ok [label="İzinli ve PIN yok"];
+  check_user_allowed -> audit_log [label="İzinli değil / üyelik sorunlu", color=red];
+  check_user_allowed -> end_deny [label="İzin yok"];
+
+  require_pin -> pin_ok [label="PIN girildi"];
+  require_pin -> guard_override [label="PIN yok / başarısız"];
+
+  pin_ok -> end_ok [label="Doğru"];
+  pin_ok -> too_many_failures [label="Yanlış"];
+
+  too_many_failures -> lock_user [label="Eşik aşıldı"];
+  too_many_failures -> audit_log [label="Eşik aşılmadı (başarısız deneme)"];
+  lock_user -> alert_security;
+  lock_user -> audit_log;
+  lock_user -> end_deny;
+
+  guard_override -> guard_auth [label="Override talebi"];
+  guard_auth -> end_guard [label="Yetkili - onayladı"];
+  guard_auth -> fallback_deny [label="Yetkili değil veya reddetti"];
+
+  fallback_deny -> audit_log;
+  fallback_deny -> end_deny;
+
+  // Audit on success paths
+  end_ok -> audit_log [style=dashed, label="Kayıtla"];
+  end_guard -> audit_log [style=dashed, label="Kayıtla (override)"];
+
+  // Styling
+  node [shape=box];
+  { rank = same; card_known; fingerprint_present; }
+  edge [fontname="Helvetica", fontsize=10];
+}
